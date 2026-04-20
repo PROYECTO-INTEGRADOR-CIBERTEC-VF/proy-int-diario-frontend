@@ -3,16 +3,51 @@ import { handleError } from '../../../core/interceptors/error.interceptor'
 import { authService } from '../services/auth.service'
 import { UiIcon } from '../../../shared/components/UiIcon'
 
+type LoginErrors = {
+  emailOrUsername?: string
+  password?: string
+}
+
 export function LoginPage() {
   const [emailOrUsername, setEmailOrUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [errors, setErrors] = useState<LoginErrors>({})
+
+  const validateForm = () => {
+    const newErrors: LoginErrors = {}
+    const trimmedValue = emailOrUsername.trim()
+
+    if (!trimmedValue) {
+      newErrors.emailOrUsername = 'El usuario o correo es obligatorio'
+    } else if (trimmedValue.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValue)) {
+      newErrors.emailOrUsername = 'Ingresa un correo válido'
+    } else if (!trimmedValue.includes('@') && trimmedValue.length < 3) {
+      newErrors.emailOrUsername = 'El usuario debe tener al menos 3 caracteres'
+    }
+
+    if (!password.trim()) {
+      newErrors.password = 'La contraseña es obligatoria'
+    } else if (password.length < 8) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+    } else if (password.length > 50) {
+      newErrors.password = 'La contraseña no debe exceder 50 caracteres'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setLoading(true)
     setError('')
+
+    const isValid = validateForm()
+    if (!isValid) return
+
+    setLoading(true)
+
 
     try {
       await authService.login({ emailOrUsername, password })
@@ -57,6 +92,9 @@ export function LoginPage() {
                   className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]"
                 />
               </div>
+              {errors.emailOrUsername ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.emailOrUsername}</p>
+              ) : null}
             </label>
 
             <label className="block text-sm font-medium text-[#374151]">
@@ -71,6 +109,9 @@ export function LoginPage() {
                   className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]"
                 />
               </div>
+              {errors.password ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.password}</p>
+              ) : null}
             </label>
           </div>
 
