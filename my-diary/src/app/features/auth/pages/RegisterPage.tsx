@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react'
+import { handleError } from '../../../core/interceptors/error.interceptor'
 import { authService } from '../services/auth.service'
 import { UiIcon } from '../../../shared/components/UiIcon'
 
@@ -20,7 +21,7 @@ export function RegisterPage() {
       await authService.register({ username, email, password, firstName, lastName })
       window.location.href = '/login'
     } catch (registerError) {
-      setError(registerError instanceof Error ? registerError.message : 'No se pudo registrar el usuario')
+      setError(handleError(registerError))
     } finally {
       setLoading(false)
     }

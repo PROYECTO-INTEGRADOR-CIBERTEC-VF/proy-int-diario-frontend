@@ -26,6 +26,8 @@ type UiIconName =
   | 'arrow-left'
   | 'palette'
   | 'settings'
+  | 'heart'
+  | 'trash'
 
 type UiIconProps = {
   name: UiIconName
@@ -59,6 +61,8 @@ const iconPaths: Record<UiIconName, string> = {
   'arrow-left': 'M19 12H5M11 19l-7-7 7-7',
   palette: 'M12 3a9 9 0 1 0 9 9 3 3 0 0 0-3-3h-1.5a2.5 2.5 0 0 1 0-5H17A9 9 0 0 0 12 3z',
   settings: 'M10.5 3h3l.6 2.2 2.3.9 2-1.1 2.1 2.1-1.1 2 1 2.3 2.2.7v3l-2.2.6-1 2.2 1 2-2.1 2.1-2-1.1-2.3 1- .7 2.2h-3l-.6-2.2-2.3-1-2 1.1-2.1-2.1 1.1-2-1-2.3-2.2-.6v-3l2.2-.7 1-2.3-1-2 2.1-2.1 2 1.1 2.3-.9z',
+  heart: 'M12 21s-6-4.35-10-9a5 5 0 0 1 7.07-7.07L12 5l2.93-2.93A5 5 0 0 1 22 12c-4 4.65-10 9-10 9z',
+  trash: 'M3 6h18M9 6V4a2 2 0 1 1 4 0v2m5 0v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h16z',
 }
 
 export function UiIcon({ name }: UiIconProps) {

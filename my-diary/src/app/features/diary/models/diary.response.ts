@@ -1,5 +1,14 @@
 export type DiaryResponse = {
-  id: string
+  id: number
   title: string
   content: string
+  userId: number
+  mood?: string | null
+  location?: string | null
+  weather?: string | null
+  tags?: string | null
+  isFavorite: boolean
+  isPrivate: boolean
+  createdAt: string
+  updatedAt: string
 }

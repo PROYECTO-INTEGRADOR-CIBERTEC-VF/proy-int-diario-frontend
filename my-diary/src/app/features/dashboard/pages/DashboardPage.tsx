@@ -1,35 +1,40 @@
+import { useEffect, useState } from 'react'
 import { UiIcon } from '../../../shared/components/UiIcon'
-
-
-const notes = [
-  { title: 'Viaje a la Playa', description: 'Recordatorio del viaje, fotos y emociones del día.', meta: '23 Abril 2024 · Diario personal', icon: 'history' as const },
-  { title: 'Reunión de Trabajo', description: 'Agenda, acuerdos y pendientes del equipo.', meta: '22 Abril 2024 · Productividad', icon: 'note' as const },
-  { title: 'Ideas para el blog', description: 'Temas, títulos y enfoque visual para la próxima entrada.', meta: '21 Abril 2024 · Creatividad', icon: 'palette' as const },
-]
+import { handleError } from '../../../core/interceptors/error.interceptor'
+import type { DiaryResponse } from '../../diary/models/diary.response'
+import { diaryService } from '../../diary/services/diary.service'
+import { formatDate } from '../../../shared/utils/date.util'
 
 export function DashboardPage() {
+  const [entries, setEntries] = useState<DiaryResponse[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const loadEntries = async () => {
+      try {
+        const response = await diaryService.listAll()
+        setEntries(response.slice(0, 4))
+      } catch (listError) {
+        setError(handleError(listError))
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    void loadEntries()
+  }, [])
+
   return (
     <section className="page page--dashboard">
-      <div className="page__hero">
-        <div>
-          <span className="eyebrow">Dashboard</span>
-          <h1>Bienvenido</h1>
-          <p>Vista principal con resumen rápido, acciones destacadas y tus notas recientes.</p>
-        </div>
-        <div className="button-row">
-          <a href="/diary/create" className="button button--primary">
-            <UiIcon name="add" />
-            Nueva nota
-          </a>
-        </div>
-      </div>
-
-      <div className="content-grid">
-        <article className="panel panel--notes">
+      <div>
+        <div className="content-grid">
+          <article className="panel panel--notes panel-historial-reciente">
+            <h1>Bienvenido</h1>
           <div className="panel__header">
             <div>
               <span className="eyebrow">Mis notas</span>
-              <h2>Historial reciente</h2>
+              <h2 className='font-semibold'>Historial reciente</h2>
             </div>
             <a className="button button--ghost" href="/diary">
               <UiIcon name="history" />
@@ -37,22 +42,20 @@ export function DashboardPage() {
             </a>
           </div>
           <div className="note-list">
-            {notes.map((note) => (
-              <article key={note.title} className="note-item">
-                <div className="note-item__badge">
-                  <UiIcon name={note.icon} />
-                </div>
+            {loading ? <div className="panel panel--status">Cargando notas...</div> : null}
+            {error ? <div className="panel panel--status panel--error">{error}</div> : null}
+            {entries.map((entry) => (
+              <article key={entry.title} className="note-item">
                 <div>
-                  <h3>{note.title}</h3>
-                  <p>{note.description}</p>
-                  <small>{note.meta}</small>
-                </div>
-                <div className="note-item__actions">
-                  <button type="button" className="icon-button"><UiIcon name="eye" /></button>
-                  <button type="button" className="icon-button"><UiIcon name="edit" /></button>
+                  <h3>{entry.title}</h3>
+                  <p>{entry.content}</p>
+                  <small>{formatDate(entry.createdAt)}</small>
                 </div>
               </article>
             ))}
+          </div>
+          <div>
+            <img className='object-cover' src='/image.png'/>
           </div>
         </article>
         <aside className='space-y-6'>
@@ -114,6 +117,7 @@ export function DashboardPage() {
             </form>
           </div>
         </aside>
+        </div>
       </div>
     </section>
   )

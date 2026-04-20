@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react'
+import { handleError } from '../../../core/interceptors/error.interceptor'
 import { authService } from '../services/auth.service'
 import { UiIcon } from '../../../shared/components/UiIcon'
 
@@ -17,7 +18,7 @@ export function LoginPage() {
       await authService.login({ emailOrUsername, password })
       window.location.href = '/dashboard'
     } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : 'No se pudo iniciar sesión')
+      setError(handleError(loginError))
     } finally {
       setLoading(false)
     }
