@@ -2,6 +2,14 @@ import { type FormEvent, useState } from 'react'
 import { authService } from '../services/auth.service'
 import { UiIcon } from '../../../shared/components/UiIcon'
 
+type RegisterErrors = {
+  username?: string
+  email?: string
+  password?: string
+  firstName?: string
+  lastName?: string
+}
+
 export function RegisterPage() {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
@@ -11,10 +19,73 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const [errors, setErrors] = useState<RegisterErrors>({})
+  const validateForm = () => {
+    const newErrors: RegisterErrors = {}
+
+    const trimmedUsername = username.trim()
+    const trimmedEmail = email.trim()
+    const trimmedFirstName = firstName.trim()
+    const trimmedLastName = lastName.trim()
+
+    if (!trimmedUsername) {
+      newErrors.username = 'El username es obligatorio'
+    } else if (trimmedUsername.length < 3) {
+      newErrors.username = 'El username debe tener al menos 3 caracteres'
+    } else if (trimmedUsername.length > 20) {
+      newErrors.username = 'El username no debe exceder 20 caracteres'
+    }
+
+    if (!trimmedEmail) {
+      newErrors.email = 'El correo es obligatorio'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      newErrors.email = 'Ingresa un correo válido'
+    } else if (trimmedEmail.length > 100) {
+      newErrors.email = 'El correo no debe exceder 100 caracteres'
+    }
+
+    if (!password.trim()) {
+      newErrors.password = 'La contraseña es obligatoria'
+    } else if (password.length < 8) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+    } else if (password.length > 50) {
+      newErrors.password = 'La contraseña no debe exceder 50 caracteres'
+    } else if (!/(?=.*[A-Z])/.test(password)) {
+      newErrors.password = 'Debe incluir al menos una letra mayúscula'
+    } else if (!/(?=.*\d)/.test(password)) {
+      newErrors.password = 'Debe incluir al menos un número'
+    } else if (!/(?=.*[!@#$%^&*()_\-+=[\]{};:'",.<>/?\\|`~])/.test(password)) {
+      newErrors.password = 'Debe incluir al menos un carácter especial'
+    }
+
+    if (!trimmedFirstName) {
+      newErrors.firstName = 'El nombre es obligatorio'
+    } else if (trimmedFirstName.length < 2) {
+      newErrors.firstName = 'El nombre debe tener al menos 2 caracteres'
+    } else if (trimmedFirstName.length > 50) {
+      newErrors.firstName = 'El nombre no debe exceder 50 caracteres'
+    }
+
+    if (!trimmedLastName) {
+      newErrors.lastName = 'El apellido es obligatorio'
+    } else if (trimmedLastName.length < 2) {
+      newErrors.lastName = 'El apellido debe tener al menos 2 caracteres'
+    } else if (trimmedLastName.length > 50) {
+      newErrors.lastName = 'El apellido no debe exceder 50 caracteres'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setLoading(true)
     setError('')
+    const isValid = validateForm()
+    if (!isValid) return
+    setLoading(true)
+
 
     try {
       await authService.register({ username, email, password, firstName, lastName })
@@ -45,6 +116,9 @@ export function RegisterPage() {
                 <UiIcon name="profile" />
                 <input value={username} onChange={(event) => setUsername(event.target.value)} type="text" placeholder="Nombre de usuario" className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]" />
               </div>
+              {errors.username ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.username}</p>
+              ) : null}
             </label>
 
             <label className="sm:col-span-2 block text-sm font-medium text-[#374151]">
@@ -53,6 +127,9 @@ export function RegisterPage() {
                 <UiIcon name="mail" />
                 <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" placeholder="correo electrónico" className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]" />
               </div>
+              {errors.email ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.email}</p>
+              ) : null}
             </label>
 
             <label className="sm:col-span-2 block text-sm font-medium text-[#374151]">
@@ -61,6 +138,9 @@ export function RegisterPage() {
                 <UiIcon name="lock" />
                 <input value={password} onChange={(event) => setPassword(event.target.value)} type="password" placeholder="Mínimo 8 caracteres" className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]" />
               </div>
+              {errors.password ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.password}</p>
+              ) : null}
             </label>
 
             <label className="block text-sm font-medium text-[#374151]">
@@ -69,6 +149,9 @@ export function RegisterPage() {
                 <UiIcon name="profile" />
                 <input value={firstName} onChange={(event) => setFirstName(event.target.value)} type="text" placeholder="Nombre" className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]" />
               </div>
+              {errors.firstName ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.firstName}</p>
+              ) : null}
             </label>
 
             <label className="block text-sm font-medium text-[#374151]">
@@ -77,6 +160,9 @@ export function RegisterPage() {
                 <UiIcon name="profile" />
                 <input value={lastName} onChange={(event) => setLastName(event.target.value)} type="text" placeholder="Apellido" className="w-full bg-transparent outline-none placeholder:text-[#9aa3b2]" />
               </div>
+              {errors.lastName ? (
+                  <p className="mt-2 text-sm font-medium text-[#be3460]">{errors.lastName}</p>
+              ) : null}
             </label>
           </div>
 
@@ -105,4 +191,5 @@ export function RegisterPage() {
       </div>
     </section>
   )
+
 }
