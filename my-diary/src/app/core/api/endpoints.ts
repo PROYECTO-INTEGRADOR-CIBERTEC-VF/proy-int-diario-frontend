@@ -5,6 +5,7 @@ export const endpoints = {
   userRoles: '/auth-service/user-roles',
   diary: '/diary-service/diary-entries',
   weather: '/weather-service/weather',
+  weatherCities: 'weather-service/cities',
   countries: '/country-service/countries',
   currency: '/currency-service/currencies',
   dashboard: '/dashboard-service/dashboard',
