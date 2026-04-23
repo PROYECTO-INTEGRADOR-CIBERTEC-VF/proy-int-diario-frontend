@@ -51,67 +51,108 @@ export function WeatherWidget() {
   const currentClima = weather?.clima?.[0]
 
   return (
-    <div className='p-6 bg-white rounded-lg border border-gray-200'>
-      <div className='flex items-center gap-4 mb-4'>
-        <span className='card-list__icon'>
+    <div className="p-6 bg-white rounded-lg border border-gray-200">
+      <div className="flex items-center gap-4 mb-4">
+        <span className="card-list__icon">
           <UiIcon name="history" />
         </span>
-        <span className="text-lg font-semibold text-gray-500 uppercase tracking-wide">Clima</span>
+        <span className="text-lg font-semibold text-gray-500 uppercase tracking-wide">
+          Clima
+        </span>
       </div>
-      <div className="space-y-3">
-        <div className="flex flex-col gap-2 p-2">
-          <select
-            name="location"
-            id="location"
-            className="flex-1 px-2 py-1 rounded border border-gray-300"
-            disabled={loadingCities}
-            value={selectedCityId ?? ''}
-            onChange={(e) => setSelectedCityId(e.target.value === '' ? null : Number(e.target.value))}
-          >
-            <option value="">
-              {loadingCities ? 'Cargando ciudades...' : 'Seleccionar ubicación'}
+
+      <div className="flex flex-col gap-2 mb-4">
+        <select
+          id="location"
+          name="location"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+          disabled={loadingCities}
+          value={selectedCityId ?? ""}
+          onChange={(e) =>
+            setSelectedCityId(e.target.value === "" ? null : Number(e.target.value))
+          }
+        >
+          <option value="">
+            {loadingCities ? "Cargando ciudades..." : "Seleccionar ubicación"}
+          </option>
+          {cities.map((city) => (
+            <option key={city.id} value={city.id}>
+              {city.name}
             </option>
-            {cities.map((city) => (
-              <option key={city.id} value={city.id}>
-                {city.name}
-              </option>
-            ))}
-          </select>
-          <button
-            className="px-4 py-1 bg-[#4566d9] text-white rounded hover:bg-[#3656c7] transition disabled:opacity-50"
-            disabled={selectedCityId === null || loadingWeather}
-            onClick={() => void handleSearch()}
-          >
-            {loadingWeather ? 'Buscando...' : 'Buscar'}
-          </button>
-        </div>
+          ))}
+        </select>
 
-        {error ? (
-          <div className="p-3 bg-red-50 rounded text-sm text-red-600">{error}</div>
-        ) : null}
+        <button
+          className="w-full px-4 py-2 bg-[#4566d9] text-white font-medium rounded-md hover:bg-[#3656c7] transition-colors disabled:opacity-50"
+          disabled={selectedCityId === null || loadingWeather}
+          onClick={() => void handleSearch()}
+        >
+          {loadingWeather ? "Buscando..." : "Buscar"}
+        </button>
+      </div>
 
-        {weather && currentClima ? (
-          <div className="p-3 bg-gray-50 rounded flex items-center gap-3">
-            <img
-              src={new URL(`../icons/${currentClima.icono}.png`, import.meta.url).href}
-              alt={currentClima.estado}
-              className="w-10 h-10"
-            />
-            <div>
-              <p className="font-semibold">{weather.ubicacion}</p>
-              <p className="text-sm text-gray-600">
-                {weather.temperatura}°C, {capitalize(currentClima.estado)}
-              </p>
+      {error && (
+        <div className="p-3 bg-red-50 rounded-md text-sm text-red-600">{error}</div>
+      )}
+
+      {weather && currentClima && (
+        <div className="mt-2 space-y-4">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-20 h-20 rounded-full bg-sky-400 flex items-center justify-center shadow-sm">
+              <img
+                src={new URL(`../icons/${currentClima.icono}.png`, import.meta.url).href}
+                alt={currentClima.estado}
+                className="w-12 h-12 object-contain"
+              />
+            </div>
+            <p className="text-sm text-gray-500 font-medium">
+              {capitalize(currentClima.estado)}
+            </p>
+          </div>
+
+          <div className="text-center">
+            <span className="text-4xl font-bold text-gray-800">
+              {weather.temperatura}°C
+            </span>
+            <span className="text-base text-gray-400 ml-1.5">
+              ({weather.sensacion_termica}°C)
+            </span>
+            <p className="text-sm font-semibold text-gray-600 mt-1">
+              {weather.ubicacion}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+            <div className="flex flex-1 flex-col items-center gap-0.5">
+              <span className="text-xs text-gray-400 uppercase tracking-wide">
+                Humedad
+              </span>
+              <span className="text-sm font-semibold text-gray-700">
+                {weather.humedad}%
+              </span>
+            </div>
+
+            <div className="w-px h-8 bg-gray-200" />
+
+            <div className="flex flex-1 flex-col items-center gap-0.5">
+              <span className="text-xs text-gray-400 uppercase tracking-wide">
+                Viento
+              </span>
+              <span className="text-sm font-semibold text-gray-700">
+                {weather.velocidad_viento} km/h
+              </span>
             </div>
           </div>
-        ) : null}
+        </div>
+      )}
 
-        {!weather && !loadingWeather && !error ? (
-          <div className="p-3 bg-gray-50 rounded">
-            <p className="text-sm text-gray-400">Selecciona una ciudad y pulsa Buscar</p>
-          </div>
-        ) : null}
-      </div>
+      {!weather && !loadingWeather && !error && (
+        <div className="p-3 bg-gray-50 rounded-md text-center">
+          <p className="text-sm text-gray-400">
+            Selecciona una ciudad y pulsa Buscar
+          </p>
+        </div>
+      )}
     </div>
   );
 }
