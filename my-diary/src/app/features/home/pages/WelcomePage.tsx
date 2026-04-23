@@ -1,4 +1,5 @@
 import { UiIcon } from '../../../shared/components/UiIcon'
+import { storageService } from '../../auth/services/storage.service'
 
 const highlights = [
   { title: 'No olvides escribir hoy', text: 'Anota cómo te sientes, qué pensaste o qué viviste. Un pequeño registro diario hace la diferencia.' },
@@ -7,7 +8,9 @@ const highlights = [
 ]
 
 export function WelcomePage() {
-  return (
+    const user = storageService.getUser()
+
+    return (
     <section className="relative overflow-hidden rounded-4xl border border-white/70 bg-white/75 px-3 py-4 shadow-[0_24px_80px_rgba(70,90,160,0.14)] backdrop-blur-xl sm:px-8 lg:px-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_15%,rgba(108,142,252,0.20),transparent_0_26%),radial-gradient(circle_at_85%_10%,rgba(244,143,177,0.18),transparent_0_24%),radial-gradient(circle_at_50%_100%,rgba(179,140,255,0.18),transparent_0_30%)]" />
 
@@ -23,6 +26,7 @@ export function WelcomePage() {
             </p>
           </div>
 
+          {!user ? (
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <a className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#4566d9] to-[#5b7de8] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4566d944] transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#4566d955]" href="/login">
               <UiIcon name="login" />
@@ -33,6 +37,7 @@ export function WelcomePage() {
               Crear cuenta
             </a>
           </div>
+          ) : null}
 
           <div className="grid gap-4 sm:grid-cols-3">
             {highlights.map((item, index) => {
