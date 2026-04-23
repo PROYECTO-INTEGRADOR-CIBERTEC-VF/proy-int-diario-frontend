@@ -97,29 +97,33 @@ export function WeatherWidget() {
 
       {weather && currentClima && (
         <div className="mt-2 space-y-4">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-20 h-20 rounded-full bg-sky-400 flex items-center justify-center shadow-sm">
-              <img
-                src={new URL(`../icons/${currentClima.icono}.png`, import.meta.url).href}
-                alt={currentClima.estado}
-                className="w-12 h-12 object-contain"
-              />
+          <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-col items-center gap-2 shrink-0">
+              <div className="w-20 h-20 rounded-full bg-sky-400 flex items-center justify-center shadow-sm">
+                <img
+                  src={new URL(`../icons/${currentClima.icono}.png`, import.meta.url).href}
+                  alt={currentClima.estado}
+                  className="w-12 h-12 object-contain"
+                />
+              </div>
+              <p className="text-sm text-gray-500 font-medium">
+                {capitalize(currentClima.estado)}
+              </p>
             </div>
-            <p className="text-sm text-gray-500 font-medium">
-              {capitalize(currentClima.estado)}
-            </p>
-          </div>
 
-          <div className="text-center">
-            <span className="text-4xl font-bold text-gray-800">
-              {weather.temperatura}°C
-            </span>
-            <span className="text-base text-gray-400 ml-1.5">
-              ({weather.sensacion_termica}°C)
-            </span>
-            <p className="text-sm font-semibold text-gray-600 mt-1">
-              {weather.ubicacion}
-            </p>
+            <div>
+              <div>
+                <span className="text-4xl font-bold text-gray-800">
+                  {weather.temperatura}°C
+                </span>
+                <span className="text-base text-gray-400 ml-1.5">
+                  ({weather.sensacion_termica}°C)
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-gray-600 mt-1">
+                {weather.ubicacion}
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
