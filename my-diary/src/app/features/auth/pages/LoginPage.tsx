@@ -51,7 +51,7 @@ export function LoginPage() {
 
     try {
       await authService.login({ emailOrUsername, password })
-      window.location.href = '/dashboard'
+      window.location.href = '/'
     } catch (loginError) {
       setError(handleError(loginError))
     } finally {

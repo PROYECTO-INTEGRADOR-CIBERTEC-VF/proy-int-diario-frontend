@@ -11,6 +11,7 @@ import { DiaryCreatePage } from '../features/diary/pages/DiaryCreatePage'
 import { DiaryEditPage } from '../features/diary/pages/DiaryEditPage'
 import { DiaryDetailPage } from '../features/diary/pages/DiaryDetailPage'
 import { ProfilePage } from '../features/profile/pages/ProfilePage'
+import { ProfileEditPage } from '../features/profile/pages/ProfileEditPage'
 
 function getPath() {
   return window.location.pathname || '/'
@@ -66,6 +67,8 @@ export function AppRoutes() {
           <DiaryDetailPage />
         ) : path === '/profile' ? (
           <ProfilePage />
+        ) : path === '/profile/edit' ? (
+          <ProfileEditPage />
         ) : (
           <DashboardPage />
         )}

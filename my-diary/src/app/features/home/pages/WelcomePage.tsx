@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { UiIcon } from '../../../shared/components/UiIcon'
 import { storageService } from '../../auth/services/storage.service'
 
@@ -8,15 +9,22 @@ const highlights = [
 ]
 
 export function WelcomePage() {
-    const user = storageService.getUser()
+  const user = storageService.getUser()
+  const [boardText, setBoardText] = useState('')
 
-    return (
+  const boardHint = useMemo(() => {
+    const length = boardText.trim().length
+    if (!length) return 'Escribe una idea, un recuerdo o una meta para hoy.'
+    if (length < 20) return '¡Bien! Ya comenzaste tu idea.'
+    return 'Se ve como una gran nota para tu diario.'
+  }, [boardText])
+
+  return (
     <section className="relative overflow-hidden rounded-4xl border border-white/70 bg-white/75 px-3 py-4 shadow-[0_24px_80px_rgba(70,90,160,0.14)] backdrop-blur-xl sm:px-8 lg:px-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_15%,rgba(108,142,252,0.20),transparent_0_26%),radial-gradient(circle_at_85%_10%,rgba(244,143,177,0.18),transparent_0_24%),radial-gradient(circle_at_50%_100%,rgba(179,140,255,0.18),transparent_0_30%)]" />
 
       <div className="relative grid gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="space-y-7">
-
           <div className="space-y-4">
             <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-[#1f2140] sm:text-5xl lg:text-6xl">
               Tu espacio personal para notas, ideas y seguimiento diario
@@ -27,16 +35,16 @@ export function WelcomePage() {
           </div>
 
           {!user ? (
-          <div className="flex flex-wrap gap-3 sm:gap-4">
-            <a className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#4566d9] to-[#5b7de8] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4566d944] transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#4566d955]" href="/login">
-              <UiIcon name="login" />
-              Iniciar sesión
-            </a>
-            <a className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#fef1f6] to-[#fff7fa] px-6 py-3 text-sm font-semibold text-[#d25b8a] border border-[#d25b8a20] shadow-md transition hover:-translate-y-1 hover:from-[#fde9f3] hover:to-[#fff4f9] hover:shadow-lg" href="/register">
-              <UiIcon name="register" />
-              Crear cuenta
-            </a>
-          </div>
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <a className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#4566d9] to-[#5b7de8] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4566d944] transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#4566d955]" href="/login">
+                <UiIcon name="login" />
+                Iniciar sesión
+              </a>
+              <a className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#fef1f6] to-[#fff7fa] px-6 py-3 text-sm font-semibold text-[#d25b8a] border border-[#d25b8a20] shadow-md transition hover:-translate-y-1 hover:from-[#fde9f3] hover:to-[#fff4f9] hover:shadow-lg" href="/register">
+                <UiIcon name="register" />
+                Crear cuenta
+              </a>
+            </div>
           ) : null}
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -75,7 +83,11 @@ export function WelcomePage() {
             <div className="mt-5 grid gap-4">
               <div className="rounded-3xl bg-[linear-gradient(135deg,#f8fbff,#edf3ff)] p-4 w-full text-end">
                 {(() => {
-                  const fechaActual = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', }).format(new Date())
+                  const fechaActual = new Intl.DateTimeFormat('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  }).format(new Date())
                   return <p className="mt-2 text-[#1f2140]">Fecha actual: <span className="font-semibold">{fechaActual}</span></p>
                 })()}
               </div>
@@ -84,18 +96,34 @@ export function WelcomePage() {
             <div className="mt-3 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold text-[#1f2140]">Resumen</h3>
+                  <h3 className="text-xl font-semibold text-[#1f2140]">Pizarra de ideas</h3>
                 </div>
               </div>
-              <div className='space-y-4'>
-                <div className='flex items-center gap-3 rounded-2xl bg-white/60 p-4 backdrop-blur-sm'>
-                  <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-[#e7edff] text-[#4566d9]'>
-                    <UiIcon name="note" />
-                  </div>
-                  <div className='flex-1'>
-                    <p className='text-sm font-semibold text-[#1f2140]'>3 notas creadas en total</p>
-                    <p className='text-xs text-[#6e7083]'>Última nota creada hace 2 días</p>
-                  </div>
+
+              <div className="mt-4 space-y-4">
+                <div className="rounded-3xl border border-dashed border-[#cfd8ff] bg-[#fbfcff] p-4 shadow-inner">
+                  <label className="block text-sm font-semibold text-[#4566d9]">Escribe una idea</label>
+                  <textarea
+                    value={boardText}
+                    onChange={(event) => setBoardText(event.target.value)}
+                    rows={5}
+                    placeholder="Hoy quiero..."
+                    className="mt-3 w-full resize-none rounded-2xl border border-[#e2e8ff] bg-white p-4 text-sm text-[#1f2140] outline-none placeholder:text-[#9aa3b2] focus:border-[#6c8efc]"
+                  />
+                  <p className="mt-3 text-sm text-[#6e7083]">{boardHint}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {['Idea del día', 'Mi meta', 'Pendiente'].map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setBoardText(label)}
+                      className="rounded-full bg-[#f4f7ff] px-4 py-2 text-sm font-medium text-[#4566d9] transition hover:bg-[#e8efff]"
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
