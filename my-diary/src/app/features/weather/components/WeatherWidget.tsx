@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UiIcon } from "../../../shared/components/UiIcon";
 import { weatherService } from "../services/weather.service";
 import type { CityResponse } from "../models/city.response";
@@ -11,10 +11,14 @@ const capitalize = (str: string): string =>
 export function WeatherWidget() {
   const [cities, setCities] = useState<CityResponse[]>([])
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null)
+  const [inputValue, setInputValue] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [weather, setWeather] = useState<WeatherResponse | null>(null)
   const [loadingCities, setLoadingCities] = useState(true)
   const [loadingWeather, setLoadingWeather] = useState(false)
   const [error, setError] = useState('')
+
+  const comboboxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadCities = async () => {
@@ -30,6 +34,43 @@ export function WeatherWidget() {
 
     void loadCities()
   }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        comboboxRef.current &&
+        !comboboxRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredCities =
+    inputValue.trim().length > 0
+      ? cities.filter((city) =>
+        city.name.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      : cities;
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    setSelectedCityId(null);
+    setIsOpen(true);
+  }
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  }
+
+  const handleSelectCity = (city: CityResponse) => {
+    setSelectedCityId(city.id);
+    setInputValue(city.name);
+    setIsOpen(false);
+  }
 
   const handleSearch = async () => {
     if (selectedCityId === null) return
@@ -62,25 +103,40 @@ export function WeatherWidget() {
       </div>
 
       <div className="flex flex-col gap-2 mb-4">
-        <select
-          id="location"
-          name="location"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
-          disabled={loadingCities}
-          value={selectedCityId ?? ""}
-          onChange={(e) =>
-            setSelectedCityId(e.target.value === "" ? null : Number(e.target.value))
-          }
-        >
-          <option value="">
-            {loadingCities ? "Cargando ciudades..." : "Seleccionar ubicación"}
-          </option>
-          {cities.map((city) => (
-            <option key={city.id} value={city.id}>
-              {city.name}
-            </option>
-          ))}
-        </select>
+        <div ref={comboboxRef} className="relative">
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+            placeholder={
+              loadingCities ? "Cargando ciudades" : "Seleccionar ubicación"
+            }
+            disabled={loadingCities}
+            value={inputValue}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            autoComplete="off"
+          />
+
+          {isOpen && !loadingCities && (
+            <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+              {filteredCities.length > 0 ? (
+                filteredCities.map((city) => (
+                  <li
+                    key={city.id}
+                    onMouseDown={() => handleSelectCity(city)}
+                    className="px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 select-none"
+                  >
+                    {city.name}
+                  </li>
+                ))
+              ) : (
+                <li className="px-3 py-2 text-sm text-gray-400 select-none">
+                  No se encontraron ciudades
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
 
         <button
           className="w-full px-4 py-2 bg-[#4566d9] text-white font-medium rounded-md hover:bg-[#3656c7] transition-colors disabled:opacity-50"
