@@ -7,6 +7,6 @@ export const endpoints = {
   weather: '/weather-service/weather',
   weatherCities: 'weather-service/cities',
   countries: '/country-service/countries',
-  currency: '/currency-service/currencies',
+  currency: '/currency-service/currency',
   dashboard: '/dashboard-service/dashboard',
 } as const
