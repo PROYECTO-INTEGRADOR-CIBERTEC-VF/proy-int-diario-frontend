@@ -1,4 +1,6 @@
 export type CityResponse = {
   id: number,
-  name: string
+  name: string,
+  country: string,
+  state: string | null
 }
