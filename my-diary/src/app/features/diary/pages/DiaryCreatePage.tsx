@@ -20,14 +20,14 @@ export function DiaryCreatePage() {
   const [error, setError] = useState('')
 
   const {
-          countryQuery,
-          countries,
-          selectedCountry,
-          searchCountries,
-          selectCountry,
-        } = useCountries()
-  
-  
+    countryQuery,
+    countries,
+    selectedCountry,
+    searchCountries,
+    selectCountry,
+  } = useCountries()
+
+
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -47,10 +47,9 @@ export function DiaryCreatePage() {
         userId,
         mood: mood || undefined,
 
-        
-        location: selectedCountry?.name || countryQuery || undefined,
-        flag: selectedCountry?.flag || undefined, 
 
+        location: selectedCountry?.name + "|" + selectedCountry?.flag || countryQuery || undefined,
+        flag: selectedCountry?.flag || undefined,
         weather: undefined,
         tags: tags || undefined,
         isFavorite,
@@ -76,37 +75,24 @@ export function DiaryCreatePage() {
       <form className="editor-card" onSubmit={handleSubmit}>
         {error ? <div className="panel">{error}</div> : null}
 
-        <label>
-          Título
-          <input value={title} onChange={(e) => setTitle(e.target.value)} />
-        </label>
-
-        <label>
-          Contenido
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} />
-        </label>
-
+        <label>Título<input type="text" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Título de la nota" /></label>
+        <label>Contenido<textarea rows={7} minLength={10} value={content} onChange={(event) => setContent(event.target.value)} placeholder="Escribe tu nota..." /></label>
         <div className="form-grid">
-
-          <label>
-            Estado de ánimo
-            <select value={mood} onChange={(e) => setMood(e.target.value)}>
+          <label>Estado de ánimo
+            <select className='border border-gray-200 rounded-sm px-2 py-3 text-gray-800' value={mood} onChange={(event) => setMood(event.target.value)}>
               <option value="">Seleccionar estado de ánimo</option>
               {moodStates.map((state) => (
-                <option key={state} value={state}>{state}</option>
+                <option key={state} value={state}>
+                  {state}
+                </option>
               ))}
             </select>
           </label>
 
-          <label>
-            Etiqueta
-            <input value={tags} onChange={(e) => setTags(e.target.value)} />
-          </label>
-
-
+          <label>Etiqueta<input type="text" value={tags} onChange={(event) => setTags(event.target.value)} placeholder="personal, trabajo..." /></label>
           <div className="relative">
 
-            {/*INPUT */}
+  
             <input
               type="text"
               value={countryQuery}
@@ -115,7 +101,7 @@ export function DiaryCreatePage() {
               className="border border-gray-50 rounded-md px-3 py-2 w-full pr-12 outline-none"
             />
 
-            {/* 🇺🇳 BANDERA A LA DERECHA */}
+
             {selectedCountry?.flag && (
               <div className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 overflow-hidden border bg-white flex items-center justify-center">
                 <img
@@ -126,7 +112,7 @@ export function DiaryCreatePage() {
               </div>
             )}
 
-            {/* lista*/}
+          
             {countryQuery.trim().length >= 2 && countries.length > 0 && (
               <ul className="absolute w-full mt-1 bg-white border border-gray-100 rounded-md shadow-lg max-h-32 overflow-auto z-10">
 
@@ -137,7 +123,6 @@ export function DiaryCreatePage() {
                     className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer"
                   >
 
-                    {/* 🇺🇳 BANDERA EN LISTA CUADRADA */}
                     <img
                       src={country.flag}
                       alt={country.name}
@@ -156,46 +141,44 @@ export function DiaryCreatePage() {
 
           </div>
 
-          {/* CHECKBOXES */}
-          <div className="flex items-center justify-around">
-
-            <label>
+          <div className='flex items-center justify-around'>
+            <label className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={isFavorite}
-                onChange={(e) => setIsFavorite(e.target.checked)}
+                onChange={(event) => setIsFavorite(event.target.checked)}
+                className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring focus:ring-blue-300"
               />
-              Favorito
+              <span className="text-gray-700">Favorito</span>
             </label>
-
-            <label>
+            <label className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={isPrivate}
-                onChange={(e) => setIsPrivate(e.target.checked)}
+                onChange={(event) => setIsPrivate(event.target.checked)}
+                className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring focus:ring-blue-300"
               />
-              Privado
+              <span className="text-gray-700">Privado</span>
             </label>
-
           </div>
 
         </div>
 
         <div className="button-row mt-2">
-  <button
-    type="submit"
-    className="button button--primary"
-    disabled={loading}
-  >
-    <UiIcon name="add" />
-    {loading ? 'Guardando...' : 'Guardar'}
-  </button>
+          <button
+            type="submit"
+            className="button button--primary"
+            disabled={loading}
+          >
+            <UiIcon name="add" />
+            {loading ? 'Guardando...' : 'Guardar'}
+          </button>
 
-  <a href="/diary" className="button button--secondary">
-    <UiIcon name="arrow-left" />
-    Volver
-  </a>
-</div>
+          <a href="/diary" className="button button--secondary">
+            <UiIcon name="arrow-left" />
+            Volver
+          </a>
+        </div>
       </form>
     </section>
   )
