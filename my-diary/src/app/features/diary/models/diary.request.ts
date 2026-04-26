@@ -4,6 +4,7 @@ export type DiaryRequest = {
   userId: number
   mood?: string
   location?: string
+  flag?: string
   weather?: string
   tags?: string
   isFavorite?: boolean

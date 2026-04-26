@@ -5,6 +5,7 @@ export type DiaryResponse = {
   userId: number
   mood?: string | null
   location?: string | null
+  flag?: string | null
   weather?: string | null
   tags?: string | null
   isFavorite: boolean
