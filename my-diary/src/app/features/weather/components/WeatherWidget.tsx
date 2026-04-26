@@ -8,6 +8,17 @@ import type { WeatherResponse } from "../models/weather.response";
 const capitalize = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1)
 
+const formatCityLabel = (city: CityResponse): string =>
+  city.state
+    ? `${city.name}, ${city.state}, ${city.country}`
+    : `${city.name}, ${city.country}`;
+
+const normalizeStr = (str: string): string =>
+  str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
 export function WeatherWidget() {
   const [cities, setCities] = useState<CityResponse[]>([])
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null)
@@ -52,7 +63,9 @@ export function WeatherWidget() {
   const filteredCities =
     inputValue.trim().length > 0
       ? cities.filter((city) =>
-        city.name.toLowerCase().includes(inputValue.toLowerCase())
+        normalizeStr(formatCityLabel(city)).includes(
+          normalizeStr(inputValue)
+        )
       )
       : cities;
 
@@ -68,7 +81,7 @@ export function WeatherWidget() {
 
   const handleSelectCity = (city: CityResponse) => {
     setSelectedCityId(city.id);
-    setInputValue(city.name);
+    setInputValue(formatCityLabel(city));
     setIsOpen(false);
   }
 
@@ -108,7 +121,7 @@ export function WeatherWidget() {
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             placeholder={
-              loadingCities ? "Cargando ciudades" : "Seleccionar ubicación"
+              loadingCities ? "Cargando ciudades" : "Buscar ciudad, estado o país"
             }
             disabled={loadingCities}
             value={inputValue}
@@ -126,7 +139,7 @@ export function WeatherWidget() {
                     onMouseDown={() => handleSelectCity(city)}
                     className="px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 select-none"
                   >
-                    {city.name}
+                    {formatCityLabel(city)}
                   </li>
                 ))
               ) : (
