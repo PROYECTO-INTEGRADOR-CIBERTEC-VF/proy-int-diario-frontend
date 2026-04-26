@@ -108,7 +108,7 @@ export function ProfilePage() {
             </div>
 
             <div className="flex items-center gap-3 text-sm text-[#6e7083]">
-              <UiIcon name="clock" />
+              <UiIcon name="calendar" />
               <span>
                 Zona horaria <br />
                 <strong className="text-[#1f2140]">GMT -5</strong>
