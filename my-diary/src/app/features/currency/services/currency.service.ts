@@ -17,6 +17,9 @@ export const currencyService = {
 
   async getCurrencies() {
     return axiosClient.get(`${endpoints.currency}/currencies`)
-  }
+  },
+  async getCurrencyMeta(code: string) {
+  return axiosClient.get(`${endpoints.currency}/exchange-rate/${code}`)
+}
 
 }
