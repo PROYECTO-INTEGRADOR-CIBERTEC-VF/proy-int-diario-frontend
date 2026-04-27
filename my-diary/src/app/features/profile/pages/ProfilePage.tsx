@@ -1,8 +1,12 @@
+import { useEffect, useState } from 'react'
+import { diaryService } from '../../diary/services/diary.service'
 import { storageService } from '../../auth/services/storage.service'
 import { UiIcon } from '../../../shared/components/UiIcon'
 
 export function ProfilePage() {
   const user = storageService.getUser()
+  const [noteCount, setNoteCount] = useState<number | null>(null)
+  const [loadingNotes, setLoadingNotes] = useState(true)
 
   const fullName = user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : 'Usuario'
   const initials = user
@@ -10,6 +14,37 @@ export function ProfilePage() {
     : 'MD'
 
   const roles = user?.roles ?? ['ROLE_USER']
+  const lastAccess = user?.updatedAt
+    ? new Intl.DateTimeFormat('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(new Date(user.updatedAt))
+    : 'No disponible'
+
+  useEffect(() => {
+    const loadNotes = async () => {
+      if (!user?.id) {
+        setNoteCount(0)
+        setLoadingNotes(false)
+        return
+      }
+
+      try {
+        setLoadingNotes(true)
+        const entries = await diaryService.getByUserId(user.id)
+        setNoteCount(entries.length)
+      } catch {
+        setNoteCount(0)
+      } finally {
+        setLoadingNotes(false)
+      }
+    }
+
+    void loadNotes()
+  }, [user?.id])
 
   return (
     <section className="space-y-8">
@@ -26,7 +61,6 @@ export function ProfilePage() {
                 type="button"
                 className="hover:scale-110 transition absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-[#4566d9] shadow-lg"
               >
-                <UiIcon name="camera" />
               </button>
             </div>
 
@@ -132,7 +166,9 @@ export function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm text-[#8a91a6]">Notas creadas</p>
-                <p className="text-xl font-bold text-[#1f2140]">1</p>
+                <p className="text-xl font-bold text-[#1f2140]">
+                  {loadingNotes ? '...' : noteCount ?? '0'}
+                </p>
               </div>
             </div>
 
@@ -142,7 +178,7 @@ export function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm text-[#8a91a6]">Último acceso</p>
-                <p className="text-xl font-bold text-[#1f2140]">22/04/2026, 03:43 p. m.</p>
+                <p className="text-xl font-bold text-[#1f2140]">{lastAccess}</p>
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { UiIcon } from '../../../shared/components/UiIcon'
 import { storageService } from '../../auth/services/storage.service'
 
@@ -10,7 +10,19 @@ const highlights = [
 
 export function WelcomePage() {
   const user = storageService.getUser()
+  const boardStorageKey = user?.id ? `my-diary-board-goal:${user.id}` : 'my-diary-board-goal:guest'
   const [boardText, setBoardText] = useState('')
+
+  useEffect(() => {
+    const savedBoardText = window.localStorage.getItem(boardStorageKey) ?? ''
+    setBoardText(savedBoardText)
+  }, [boardStorageKey])
+
+  const updateBoardText = (value: string) => {
+    setBoardText(value)
+    window.localStorage.setItem(boardStorageKey, value)
+    window.dispatchEvent(new Event('my-diary-board-updated'))
+  }
 
   const boardHint = useMemo(() => {
     const length = boardText.trim().length
@@ -26,7 +38,7 @@ export function WelcomePage() {
       <div className="relative grid gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="space-y-7">
           <div className="space-y-4">
-            <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-[#1f2140] sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-[#1f2140] sm:text-4xl lg:text-5xl">
               Tu espacio personal para notas, ideas y seguimiento diario
             </h1>
             <p className="max-w-2xl text-base leading-8 text-[#6e7083] sm:text-lg">
@@ -105,7 +117,7 @@ export function WelcomePage() {
                   <label className="block text-sm font-semibold text-[#4566d9]">Escribe una idea</label>
                   <textarea
                     value={boardText}
-                    onChange={(event) => setBoardText(event.target.value)}
+                    onChange={(event) => updateBoardText(event.target.value)}
                     rows={5}
                     placeholder="Hoy quiero..."
                     className="mt-3 w-full resize-none rounded-2xl border border-[#e2e8ff] bg-white p-4 text-sm text-[#1f2140] outline-none placeholder:text-[#9aa3b2] focus:border-[#6c8efc]"
@@ -114,11 +126,11 @@ export function WelcomePage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {['Idea del día', 'Mi meta', 'Pendiente'].map((label) => (
+                  {['Cumpleaños', 'Hacer Tarea', 'Pendiente Reuniones'].map((label) => (
                     <button
                       key={label}
                       type="button"
-                      onClick={() => setBoardText(label)}
+                      onClick={() => updateBoardText(label)}
                       className="rounded-full bg-[#f4f7ff] px-4 py-2 text-sm font-medium text-[#4566d9] transition hover:bg-[#e8efff]"
                     >
                       {label}
