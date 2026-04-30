@@ -150,7 +150,7 @@ export function DiaryDetailPage() {
 
           <aside className="space-y-4">
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_14px_34px_rgba(30,41,59,0.06)]">
-              <h3 className="text-base font-bold text-slate-900">Metadatos</h3>
+              <h3 className="text-base font-bold text-slate-900">Informacion:</h3>
               <div className="mt-4 space-y-3 text-sm text-slate-600">
                 <p className="flex items-start justify-between gap-3">
                   <span className="font-semibold text-slate-800">Creada</span>
